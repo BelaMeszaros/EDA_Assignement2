@@ -1,4 +1,5 @@
 library(tools)
+library(ggplot2)
 ## Cheking the presence of the files
 if (!file.exists('summarySCC_PM25.rds')) {
     stop('Data file must be in the project folder!')
@@ -21,8 +22,6 @@ SCC <- readRDS("Source_Classification_Code.rds")
 
 Emission <- aggregate(x = NEI$Emissions, by = list(NEI$year, NEI$fips), FUN = "sum")
 Emission <- Emission[Emission$Group.2 == "24510",]
-png(filename = "plot2.png")
-plot(Emission$Group.1, Emission$x, type="l", xlab = "year",
-     ylab = "total PM2.5 emission [tons]",
-     main = " Total PM2.5 emissions in Baltimore between 1999 and 2008")
+png(filename = "plot3.png")
+
 dev.off()
