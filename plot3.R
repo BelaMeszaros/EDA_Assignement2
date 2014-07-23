@@ -20,8 +20,14 @@ if md5sum('Source_Classification_Code.rds') != "654c37a693d7cc08fe0962e4765d9d15
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-Emission <- aggregate(x = NEI$Emissions, by = list(NEI$year, NEI$fips), FUN = "sum")
-Emission <- Emission[Emission$Group.2 == "24510",]
-png(filename = "plot3.png")
-
+Emission <- NEI[NEI$fips == "24510", ]
+Emission <- aggregate(x = NEI$Emissions, by = list(NEI$year, NEI$type), FUN = "sum")
+Emission$x <- log(Emission$x)
+png(filename = "plot3.png", width = 960, height = 480)
+g <- ggplot(Emission, aes(Group.1, x))
+g + geom_line() + 
+    facet_grid(. ~ Group.2) +
+    labs(x = "year") +
+    labs(y = expression("log " * PM[2.5])) +
+    labs(title = "PM2.5 emissions in Baltimore between 1999 and 2008 from different sources")
 dev.off()
