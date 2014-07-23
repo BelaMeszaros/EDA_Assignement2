@@ -19,15 +19,16 @@ if md5sum('Source_Classification_Code.rds') != "654c37a693d7cc08fe0962e4765d9d15
 ## Loading data - it may take a while
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
-
-Emission <- NEI[NEI$fips == "24510", ]
-Emission <- aggregate(x = Emission$Emissions, by = list(Emission$year, Emission$type), FUN = "sum")
-# Emission$x <- log(Emission$x)
-png(filename = "plot3.png", width = 960, height = 480)
+## Getting the SCC codes related to motor vehicle sources
+## Not having detailed instructions about how to extract this info
+## it seems to be a good way giving 1138 codes
+MotorVehicleCodes <- SCC[regexpr("On-Road",SCC$EI.Sector) != -1, c(1)]
+Emission <- NEI[NEI$SCC %in% MotorVehicleCodes & NEI$fips == "24510", ]
+Emission <- aggregate(x = Emission$Emissions, by = list(Emission$year), FUN = "sum")
+png(filename = "plot5.png", width = 960)
 g <- ggplot(Emission, aes(Group.1, x))
 g + geom_line() + 
-    facet_grid(. ~ Group.2) +
     labs(x = "year") +
     labs(y = expression(PM[2.5] * " [tons]")) +
-    labs(title = "PM2.5 emissions in Baltimore between 1999 and 2008 from different sources")
+    labs(title = "PM2.5 emissions from motor vehicle sources in Baltimore between 1999 and 2008 from different sources")
 dev.off()
